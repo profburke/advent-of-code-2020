@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"sort"
 	"strconv"
@@ -16,8 +17,7 @@ func readData() (data []int) {
 		i, err := strconv.Atoi(line)
 
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "converting string to int: ", err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		data = append(data, i)
@@ -26,12 +26,20 @@ func readData() (data []int) {
 	return data
 }
 
+func found(list []int, item int) bool {
+	index := sort.SearchInts(list, item)
+	if list[index] == item {
+		return true
+	} else {
+		return false
+	}
+}
+
 func part1(expenses []int) {
 	for _, val := range expenses {
 		other := 2020 - val
-		index := sort.SearchInts(expenses, other)
 
-		if expenses[index] == other {
+		if found(expenses, other) {
 			fmt.Fprintln(os.Stdout, val, "*", other, "=", val*other)
 			return
 		}
@@ -40,23 +48,24 @@ func part1(expenses []int) {
 	fmt.Fprintln(os.Stdout, "Couldn't find a match")
 }
 
+func copyWithout(s []int, i int) []int {
+	result := make([]int, len(s))
+	copy(result, s)
+	copy(s[i:], s[i+1:])
+	s = s[:len(s)-1]
+
+	return s
+}
+
 func part2(expenses []int) {
 	for i, val1 := range expenses {
 		target := 2020 - val1
-
-		var reducedExpenses = make([]int, len(expenses))
-		copy(reducedExpenses, expenses)
-
-		copy(reducedExpenses[i:], reducedExpenses[i+1:])
-		tail := len(reducedExpenses) - 1
-		reducedExpenses[tail] = 0
-		reducedExpenses = reducedExpenses[:tail]
+		var reducedExpenses = copyWithout(expenses, i)
 
 		for _, val := range reducedExpenses {
 			other := target - val
-			index := sort.SearchInts(reducedExpenses, other)
 
-			if reducedExpenses[index] == other {
+			if found(reducedExpenses, other) {
 				fmt.Fprintln(os.Stdout, val1, "*", val, "*", other, "=",
 					val1*val*other)
 				return

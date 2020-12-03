@@ -7,10 +7,15 @@ import (
 	"strings"
 )
 
+const tree string = "#"
+
 type Position struct {
 	X, Y int
 }
 
+// NOTE: because after decades of programming rows/columns vs x/y
+// always gives me headaches... treat the coordinates opposite from
+// what they should be.
 func (p Position) addMod(other Position, bound int) (sum Position) {
 	sum.Y = (p.Y + other.Y) % bound
 	sum.X = p.X + other.X
@@ -36,7 +41,7 @@ func countCollisions(trees [][]string, slope Position) int {
 	position := Position{X: 0, Y: 0}
 
 	for position.X < rows {
-		if trees[position.X][position.Y] == "#" {
+		if trees[position.X][position.Y] == tree {
 			treeCount++
 		}
 
@@ -46,15 +51,25 @@ func countCollisions(trees [][]string, slope Position) int {
 	return treeCount
 }
 
-func part1(trees [][]string) {
-	slope := Position{X: 1, Y: 3}
+func collisionProduct(trees [][]string, slopes []Position) (result int) {
+	result = 1
 
-	treeCount := countCollisions(trees, slope)
-	fmt.Println("Trees passed =", treeCount)
+	for _, slope := range slopes {
+		result *= countCollisions(trees, slope)
+	}
+
+	return
+}
+
+func part1(trees [][]string) {
+	slopes := []Position{
+		Position{X: 1, Y: 3},
+	}
+
+	fmt.Println("Part 1 =", collisionProduct(trees, slopes))
 }
 
 func part2(trees [][]string) {
-	product := 1
 	slopes := []Position{
 		Position{X: 1, Y: 1},
 		Position{X: 1, Y: 3},
@@ -63,10 +78,7 @@ func part2(trees [][]string) {
 		Position{X: 2, Y: 1},
 	}
 
-	for _, slope := range slopes {
-		product *= countCollisions(trees, slope)
-	}
-	fmt.Println("Product of the collisions =", product)
+	fmt.Println("Part 2 =", collisionProduct(trees, slopes))
 }
 
 func main() {

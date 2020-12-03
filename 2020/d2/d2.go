@@ -14,7 +14,7 @@ type ValidationRule struct {
 	C     rune
 }
 
-func (rule ValidationRule) isValid(candidate string) bool {
+func (rule ValidationRule) isValidUsingRange(candidate string) bool {
 	occurences := 0
 
 	for _, char := range candidate {
@@ -25,7 +25,7 @@ func (rule ValidationRule) isValid(candidate string) bool {
 	return (occurences >= rule.Lower && occurences <= rule.Upper)
 }
 
-func (rule ValidationRule) isValid2(candidate string) bool {
+func (rule ValidationRule) isValidUsingExclusivePositions(candidate string) bool {
 	occurences := 0
 	len := len(candidate)
 
@@ -38,6 +38,14 @@ func (rule ValidationRule) isValid2(candidate string) bool {
 	}
 
 	return (occurences == 1)
+}
+
+func (rule ValidationRule) isValid(candidate, ruleType string) bool {
+	if ruleType == "range" {
+		return rule.isValidUsingRange(candidate)
+	} else {
+		return rule.isValidUsingExclusivePositions(candidate)
+	}
 }
 
 type Entry struct {
@@ -53,11 +61,7 @@ func readData() (entries []Entry) {
 		pieces := strings.Fields(line)
 
 		bounds := strings.FieldsFunc(pieces[0], func(r rune) bool {
-			if r == '-' {
-				return true
-			} else {
-				return false
-			}
+			return (r == '-')
 		})
 
 		lower, _ := strconv.Atoi(bounds[0])
@@ -65,7 +69,7 @@ func readData() (entries []Entry) {
 
 		c := rune(strings.Trim(pieces[1], ":")[0])
 
-		candidate := strings.Trim(pieces[2], " ")
+		candidate := strings.TrimSpace(pieces[2])
 
 		rule := ValidationRule{Lower: lower, Upper: upper, C: c}
 		entry := Entry{Candidate: candidate, Rule: rule}
@@ -75,33 +79,23 @@ func readData() (entries []Entry) {
 	return entries
 }
 
-func part1(entries []Entry) {
+// func validate(entries []Entry, partNumber int, ruleType string) {
+func validate(entries []Entry, partNumber int, ruleType string) {
 	validPasswords := 0
 	for _, entry := range entries {
-		if entry.Rule.isValid(entry.Candidate) {
+		if entry.Rule.isValid(entry.Candidate, ruleType) {
 			validPasswords++
 		}
 	}
 
-	fmt.Println("The number of valid passwords is", validPasswords)
-}
-
-func part2(entries []Entry) {
-	validPasswords := 0
-	for _, entry := range entries {
-		if entry.Rule.isValid2(entry.Candidate) {
-			validPasswords++
-		}
-	}
-
-	fmt.Println("The number of valid passwords is", validPasswords)
+	fmt.Println("Part", partNumber, "=", validPasswords)
 }
 
 func main() {
 	entries := readData()
 
-	part1(entries)
-	part2(entries)
+	validate(entries, 1, "range")
+	validate(entries, 2, "")
 }
 
 // Local Variables:

@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -45,7 +47,7 @@ func readData() (documents []Document) {
 	return
 }
 
-func isValid(document Document) bool {
+func hasRequiredFields(document Document) bool {
 	_, byr := document.Fields["byr"]
 	_, iyr := document.Fields["iyr"]
 	_, eyr := document.Fields["eyr"]
@@ -61,7 +63,7 @@ func part1(documents []Document) {
 	validPassports := 0
 
 	for _, document := range documents {
-		if isValid(document) {
+		if hasRequiredFields(document) {
 			validPassports++
 		}
 	}
@@ -69,7 +71,91 @@ func part1(documents []Document) {
 	fmt.Println("Part 1 = ", validPassports)
 }
 
+func validByr(byr string) bool {
+	val, err := strconv.Atoi(byr)
+	if err != nil {
+		return false
+	}
+
+	return (val >= 1920 && val <= 2002)
+}
+
+func validIyr(iyr string) bool {
+	val, err := strconv.Atoi(iyr)
+	if err != nil {
+		return false
+	}
+
+	return (val >= 2010 && val <= 2020)
+}
+
+func validEyr(eyr string) bool {
+	val, err := strconv.Atoi(eyr)
+	if err != nil {
+		return false
+	}
+
+	return (val >= 2020 && val <= 2030)
+}
+
+func validHgt(hgt string) bool {
+	re, _ := regexp.Compile("(\\d+)(in|cm)")
+	parts := re.FindStringSubmatch(hgt)
+
+	// first item in slice is entire match
+	if len(parts) != 3 {
+		return false
+	}
+
+	val, _ := strconv.Atoi(parts[1])
+
+	if parts[2] == "cm" {
+		return (val >= 150 && val <= 193)
+	} else if parts[2] == "in" {
+		return (val >= 59 && val <= 76)
+	} else {
+		return false
+	}
+}
+
+func validHcl(hcl string) bool {
+	matched, _ := regexp.Match(`#[0-9a-f]{6}`, []byte(hcl))
+	return matched
+}
+
+func validEcl(ecl string) bool {
+	return ecl == "amb" || ecl == "blu" || ecl == "brn" ||
+		ecl == "gry" || ecl == "grn" || ecl == "hzl" || ecl == "oth"
+}
+
+func validPid(pid string) bool {
+	// for some reason, this is returning true for strings that are less than 9 digits long
+
+	if len(pid) != 9 {
+		return false
+	}
+
+	matched, _ := regexp.Match(`\d{9}`, []byte(pid))
+	return matched
+}
+
+func fieldsAreValid(document Document) bool {
+	return validByr(document.Fields["byr"]) && validIyr(document.Fields["iyr"]) &&
+		validEyr(document.Fields["eyr"]) && validHgt(document.Fields["hgt"]) &&
+		validHcl(document.Fields["hcl"]) && validEcl(document.Fields["ecl"]) &&
+		validPid(document.Fields["pid"])
+}
+
 func part2(documents []Document) {
+	validPassports := 0
+
+	for _, document := range documents {
+		if hasRequiredFields(document) && fieldsAreValid(document) {
+			validPassports++
+		}
+	}
+
+	fmt.Println("Part 2 = ", validPassports)
 }
 
 func main() {

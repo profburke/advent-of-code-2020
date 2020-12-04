@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-// For part 1, we don't really care what's in the fields...
 type Document struct {
 	Fields map[string]string
 }
@@ -59,43 +58,25 @@ func hasRequiredFields(document Document) bool {
 	return byr && iyr && eyr && hgt && hcl && ecl && pid
 }
 
-func part1(documents []Document) {
-	validPassports := 0
-
-	for _, document := range documents {
-		if hasRequiredFields(document) {
-			validPassports++
-		}
+func yearInRange(val string, lower, upper int) bool {
+	year, err := strconv.Atoi(val)
+	if err != nil {
+		return false
 	}
 
-	fmt.Println("Part 1 = ", validPassports)
+	return (year >= lower && year <= upper)
 }
 
 func validByr(byr string) bool {
-	val, err := strconv.Atoi(byr)
-	if err != nil {
-		return false
-	}
-
-	return (val >= 1920 && val <= 2002)
+	return yearInRange(byr, 1920, 2002)
 }
 
 func validIyr(iyr string) bool {
-	val, err := strconv.Atoi(iyr)
-	if err != nil {
-		return false
-	}
-
-	return (val >= 2010 && val <= 2020)
+	return yearInRange(iyr, 2010, 2020)
 }
 
 func validEyr(eyr string) bool {
-	val, err := strconv.Atoi(eyr)
-	if err != nil {
-		return false
-	}
-
-	return (val >= 2020 && val <= 2030)
+	return yearInRange(eyr, 2020, 2030)
 }
 
 func validHgt(hgt string) bool {
@@ -146,16 +127,28 @@ func fieldsAreValid(document Document) bool {
 		validPid(document.Fields["pid"])
 }
 
-func part2(documents []Document) {
+func countValidDocuments(documents []Document, validator func(Document) bool) int {
 	validPassports := 0
 
 	for _, document := range documents {
-		if hasRequiredFields(document) && fieldsAreValid(document) {
+		if validator(document) {
 			validPassports++
 		}
 	}
 
-	fmt.Println("Part 2 = ", validPassports)
+	return validPassports
+}
+
+func part1(documents []Document) {
+	fmt.Println("Part 1 = ", countValidDocuments(documents,
+		func(document Document) bool { return hasRequiredFields(document) }))
+}
+
+func part2(documents []Document) {
+	fmt.Println("Part 2 = ", countValidDocuments(documents,
+		func(document Document) bool {
+			return hasRequiredFields(document) && fieldsAreValid(document)
+		}))
 }
 
 func main() {

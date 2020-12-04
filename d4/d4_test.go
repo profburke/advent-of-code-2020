@@ -1,23 +1,28 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 type D4Test struct {
 	doc  Document
 	want bool
 }
 
+// QUESTION: not sure if t.Helper() is needed here.
+
 func looper(t *testing.T, tests []D4Test, field string, validator func(string) bool) {
 	t.Helper()
 	for _, tt := range tests {
-		got := validator(tt.doc.Fields[field])
+		value := tt.doc.Fields[field]
+		got := validator(value)
 		if got != tt.want {
-			t.Errorf("got %v want %v", got, tt.want)
+			t.Errorf("|%s|: got %v want %v", value, got, tt.want)
 		}
 	}
 }
 
-// TODO: would it be better to put all these into one function, grouped by
+// QUESTION: would it be better to put all these into one function, grouped by
 //       t.Run ?
 
 func TestValidByr(t *testing.T) {

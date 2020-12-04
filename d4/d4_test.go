@@ -17,6 +17,9 @@ func looper(t *testing.T, tests []D4Test, field string, validator func(string) b
 	}
 }
 
+// TODO: would it be better to put all these into one function, grouped by
+//       t.Run ?
+
 func TestValidByr(t *testing.T) {
 	tests := []D4Test{
 		{Document{Fields: map[string]string{"byr": "1920"}}, true},

@@ -139,7 +139,6 @@ func TestValidEcl(t *testing.T) {
 	}
 }
 
-// WTF ??!?
 func TestValidPid(t *testing.T) {
 	tests := []struct {
 		doc  Document

@@ -110,13 +110,7 @@ func validEcl(ecl string) bool {
 }
 
 func validPid(pid string) bool {
-	// for some reason, this is returning true for strings that are less than 9 digits long
-
-	if len(pid) != 9 {
-		return false
-	}
-
-	matched, _ := regexp.Match(`\d{9}`, []byte(pid))
+	matched, _ := regexp.Match(`^\d{9}$`, []byte(pid))
 	return matched
 }
 

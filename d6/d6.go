@@ -20,6 +20,7 @@ func readData() (data [][]map[string]bool) {
 		if line == "" {
 			data = append(data, group)
 			group = make([]map[string]bool, 0)
+			continue
 		}
 
 		for _, c := range strings.Split(line, "") {
@@ -45,7 +46,6 @@ func part1(data [][]map[string]bool) {
 			}
 		}
 
-		fmt.Println("Group", len(yesQuestions))
 		sum += len(yesQuestions)
 	}
 
@@ -53,6 +53,31 @@ func part1(data [][]map[string]bool) {
 }
 
 func part2(data [][]map[string]bool) {
+	sum := 0
+
+	for _, group := range data {
+		groupSize := len(group)
+		yesQuestions := make(map[string]int)
+
+		for _, person := range group {
+			for key, _ := range person {
+				_, found := yesQuestions[key]
+				if found {
+					yesQuestions[key]++
+				} else {
+					yesQuestions[key] = 1
+				}
+			}
+		}
+
+		for key, _ := range yesQuestions {
+			if yesQuestions[key] == groupSize {
+				sum++
+			}
+		}
+	}
+
+	fmt.Println("Part 2 =", sum)
 }
 
 func main() {

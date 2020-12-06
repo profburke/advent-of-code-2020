@@ -8,9 +8,7 @@ import (
 )
 
 func readData() (data [][]map[string]bool) {
-
 	scanner := bufio.NewScanner(os.Stdin)
-
 	group := make([]map[string]bool, 0)
 
 	for scanner.Scan() {
@@ -61,12 +59,7 @@ func part2(data [][]map[string]bool) {
 
 		for _, person := range group {
 			for key, _ := range person {
-				_, found := yesQuestions[key]
-				if found {
-					yesQuestions[key]++
-				} else {
-					yesQuestions[key] = 1
-				}
+				yesQuestions[key]++
 			}
 		}
 

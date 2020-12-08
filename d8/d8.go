@@ -30,42 +30,22 @@ func readData() (program []Instruction) {
 	return
 }
 
-func part1(program []Instruction) {
+func run(program []Instruction) (acc int, reason string) {
 	pc := 0
-	acc := 0
+	acc = 0
 	seen := make(map[int]bool)
 
 	for true {
 		_, found := seen[pc]
 		if found {
+			reason = "loop"
 			break
 		}
 
 		seen[pc] = true
-		i := program[pc]
-		fmt.Println(pc, "|", i)
-		switch i.Opcode {
-		case "acc":
-			acc += i.Operand
-		case "jmp":
-			pc += (i.Operand - 1)
-		case "nop":
-		}
 
-		pc++
-
-	}
-
-	fmt.Println("part 1 =", acc)
-}
-
-func part2(program []Instruction) {
-	pc := 0
-	acc := 0
-	program[600].Opcode = "nop"
-
-	for true {
-		if pc == len(program) {
+		if pc >= len(program) {
+			reason = "terminate"
 			break
 		}
 
@@ -80,7 +60,38 @@ func part2(program []Instruction) {
 		}
 
 		pc++
+	}
 
+	return
+}
+
+func part1(program []Instruction) {
+	acc, _ := run(program)
+	fmt.Println("part 1 =", acc)
+}
+
+func part2(program []Instruction) {
+	var acc int
+	var reason string
+
+	for index, instruction := range program {
+		alteredProgram := make([]Instruction, len(program))
+		copy(alteredProgram, program)
+
+		if instruction.Opcode == "jmp" {
+			instruction.Opcode = "nop"
+			alteredProgram[index] = instruction
+		} else if instruction.Opcode == "nop" {
+			instruction.Opcode = "jmp"
+			alteredProgram[index] = instruction
+		} else {
+			continue
+		}
+
+		acc, reason = run(alteredProgram)
+		if reason == "terminate" {
+			break
+		}
 	}
 
 	fmt.Println("part 2 =", acc)
@@ -89,7 +100,7 @@ func part2(program []Instruction) {
 func main() {
 	program := readData()
 
-	// part1(program)
+	part1(program)
 	part2(program)
 }
 

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -59,7 +60,7 @@ func isValid(target int, preamble []int) bool {
 	return (err == nil)
 }
 
-func part1(data []int, size int) (err error) {
+func part1(data []int, size int) (badwolf int, err error) {
 	preamble := data[:size]
 	data = data[size:]
 
@@ -67,6 +68,8 @@ func part1(data []int, size int) (err error) {
 		target := data[0]
 		if !isValid(target, preamble) {
 			fmt.Println("Part 1 =", target)
+
+			badwolf = target
 			return
 		}
 		preamble = preamble[1:]
@@ -82,14 +85,48 @@ func part1(data []int, size int) (err error) {
 	return
 }
 
-func part2(data []int) {
+func sum(low, high int, data []int) (s, min, max int) {
+	min = math.MaxInt64
+	max = math.MinInt64
+
+	for index := low; index <= high; index++ {
+		if data[index] < min {
+			min = data[index]
+		}
+
+		if data[index] > max {
+			max = data[index]
+		}
+
+		s += data[index]
+	}
+
+	return
+}
+
+func part2(target int, data []int) {
+	var low, high int
+
+	for low = 0; low < len(data); low++ {
+		for high = low + 1; high < len(data); high++ {
+			s, min, max := sum(low, high, data)
+
+			if s == target {
+				fmt.Println("Part 2:", min+max)
+				return
+			} else if s > target {
+				break
+			}
+		}
+	}
+	fmt.Println("Something's wrong...")
 }
 
 func main() {
 	data := readData()
 
-	part1(data, 25)
-	part2(data)
+	badwolf, _ := part1(data, 25)
+	part2(badwolf, data)
 }
 
 // Local Variables:

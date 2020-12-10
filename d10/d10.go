@@ -8,6 +8,12 @@ import (
 	"strconv"
 )
 
+var memo map[int]int
+
+func init() {
+	memo = make(map[int]int)
+}
+
 func readData() (adaptors []int) {
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -58,9 +64,62 @@ func part1(adaptors []int) {
 	fmt.Println("Part 1 =", oneJoltDifferences*threeJoltDifferences)
 }
 
+func inRange(target, n int) bool {
+	difference := target - n
+
+	return (difference >= 1 && difference <= 3)
+}
+
+// assuming each adaptor is unique
+func dp(current int, adaptors []int) (count int) {
+	var found bool
+	if count, found = memo[current]; found {
+		return
+	}
+
+	// if len(adaptors) == 0 {
+	// 	// since there aren't any more adaptors then these
+	// 	// all plug directly into the socket
+	// 	if current == 1 || current == 2 || current == 3 {
+	// 		fmt.Println("base case")
+	// 		count = 1
+	// 	} else { // shouldn't happen
+	// 		// TODO: throw an error
+	// 		count = 0
+	// 	}
+
+	// 	memo[current] = 1
+	// 	return
+	// }
+
+	count = 0
+
+	if current == 3 || current == 2 || current == 1 {
+		count++
+	}
+
+	if len(adaptors) > 0 && inRange(current, adaptors[0]) {
+		count += dp(adaptors[0], adaptors[1:])
+	}
+
+	if len(adaptors) > 1 && inRange(current, adaptors[1]) {
+		count += dp(adaptors[1], adaptors[2:])
+	}
+
+	if len(adaptors) > 2 && inRange(current, adaptors[2]) {
+		count += dp(adaptors[2], adaptors[3:])
+	}
+
+	memo[current] = count
+	return
+}
+
 func part2(adaptors []int) {
-	count := 0
-	fmt.Println("Part 2=", count)
+	sort.Sort(sort.Reverse(sort.IntSlice(adaptors)))
+	device := adaptors[0] + 3
+
+	count := dp(device, adaptors)
+	fmt.Println("Part 2 =", count)
 }
 
 func main() {

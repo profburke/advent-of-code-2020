@@ -1,6 +1,6 @@
 package main
 
-func determineNewPosition(position Coordinates, heading Heading, distance int) (newPosition Coordinates) {
+func move(position Coordinates, heading Heading, distance int) (newPosition Coordinates) {
 	switch heading {
 	case N:
 		newPosition.X = position.X
@@ -19,7 +19,7 @@ func determineNewPosition(position Coordinates, heading Heading, distance int) (
 	return
 }
 
-func goRight(heading Heading, degrees int) (newHeading Heading) {
+func turnRight(heading Heading, degrees int) (newHeading Heading) {
 	switch heading {
 	case N:
 		switch degrees {
@@ -62,7 +62,7 @@ func goRight(heading Heading, degrees int) (newHeading Heading) {
 	return
 }
 
-func goLeft(heading Heading, degrees int) (newHeading Heading) {
+func turnLeft(heading Heading, degrees int) (newHeading Heading) {
 	switch heading {
 	case N:
 		switch degrees {
@@ -105,11 +105,11 @@ func goLeft(heading Heading, degrees int) (newHeading Heading) {
 	return
 }
 
-func determineNewHeading(heading Heading, command Command) (newHeading Heading) {
+func changeHeading(heading Heading, command Command) (newHeading Heading) {
 	if command.Direction == "L" {
-		newHeading = goLeft(heading, command.Distance)
+		newHeading = turnLeft(heading, command.Distance)
 	} else {
-		newHeading = goRight(heading, command.Distance)
+		newHeading = turnRight(heading, command.Distance)
 	}
 
 	return
@@ -120,11 +120,11 @@ func steer(position, waypoint Coordinates, heading Heading, command Command) (ne
 
 	switch command.Direction {
 	case "F":
-		newPosition = determineNewPosition(position, heading, command.Distance)
+		newPosition = move(position, heading, command.Distance)
 		newHeading = heading
 	case "R", "L":
 		newPosition.X, newPosition.Y = position.X, position.Y
-		newHeading = determineNewHeading(heading, command)
+		newHeading = changeHeading(heading, command)
 	case "N":
 		newPosition.X, newPosition.Y = position.X, position.Y-command.Distance
 		newHeading = heading

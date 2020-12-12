@@ -25,28 +25,24 @@ func rotateWaypoint(waypoint Coordinates, command Command) (newWaypoint Coordina
 
 func steerByWaypoint(position, waypoint Coordinates, heading Heading, command Command) (newPosition,
 	newWaypoint Coordinates, newHeading Heading) {
+	newWaypoint = waypoint
 	newHeading = heading
+	newPosition = position
 
 	switch command.Direction {
 	case "F":
 		newPosition.X = position.X + command.Distance*waypoint.X
 		newPosition.Y = position.Y + command.Distance*waypoint.Y
-		newWaypoint = waypoint
 	case "R", "L":
 		newWaypoint = rotateWaypoint(waypoint, command)
-		newPosition = position
 	case "N":
 		newWaypoint.X, newWaypoint.Y = waypoint.X, waypoint.Y-command.Distance
-		newPosition = position
 	case "E":
 		newWaypoint.X, newWaypoint.Y = waypoint.X+command.Distance, waypoint.Y
-		newPosition = position
 	case "S":
 		newWaypoint.X, newWaypoint.Y = waypoint.X, waypoint.Y+command.Distance
-		newPosition = position
 	case "W":
 		newWaypoint.X, newWaypoint.Y = waypoint.X-command.Distance, waypoint.Y
-		newPosition = position
 	}
 
 	return

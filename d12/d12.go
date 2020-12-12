@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"fmt"
+	"math"
 	"os"
 	"strconv"
 )
@@ -19,11 +21,25 @@ func readData() (data []Command) {
 	return
 }
 
+func doit(commands []Command, partN int,
+	steer func(Coordinates, Coordinates, Heading, Command) (Coordinates, Coordinates, Heading)) {
+	position := Coordinates{X: 0, Y: 0}
+	waypoint := Coordinates{X: 10, Y: -1}
+	heading := E
+
+	for _, command := range commands {
+		position, waypoint, heading = steer(position, waypoint, heading, command)
+	}
+
+	manhattan := int(math.Abs(float64(position.X)) + math.Abs(float64(position.Y)))
+	fmt.Printf("Part %d = %d\n", partN, manhattan)
+}
+
 func main() {
 	commands := readData()
 
-	part1(commands)
-	part2(commands)
+	doit(commands, 1, steer)
+	doit(commands, 2, steerByWaypoint)
 }
 
 // Local Variables:

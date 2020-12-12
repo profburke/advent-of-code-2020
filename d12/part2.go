@@ -1,22 +1,16 @@
 package main
 
-import (
-	"fmt"
-	"math"
-)
-
 func rotateWaypoint(waypoint Coordinates, command Command) (newWaypoint Coordinates) {
+	// standard 2d rotation around origin but taking into account
+	// fact that angle values are only ever 90, 180, 270 and keeping everything as int
 	var s, c int
 	switch command.Distance {
 	case 90:
-		s = 1
-		c = 0
+		s, c = 1, 0
 	case 180:
-		s = 0
-		c = -1
+		s, c = 0, -1
 	case 270:
-		s = -1
-		c = 0
+		s, c = -1, 0
 	}
 
 	if command.Direction == "L" {
@@ -29,8 +23,10 @@ func rotateWaypoint(waypoint Coordinates, command Command) (newWaypoint Coordina
 	return
 }
 
-func steerByWaypoint(position, waypoint Coordinates, command Command) (newPosition,
-	newWaypoint Coordinates) {
+func steerByWaypoint(position, waypoint Coordinates, heading Heading, command Command) (newPosition,
+	newWaypoint Coordinates, newHeading Heading) {
+	newHeading = heading
+
 	switch command.Direction {
 	case "F":
 		newPosition.X = position.X + command.Distance*waypoint.X
@@ -54,18 +50,6 @@ func steerByWaypoint(position, waypoint Coordinates, command Command) (newPositi
 	}
 
 	return
-}
-
-func part2(commands []Command) {
-	position := Coordinates{X: 0, Y: 0}
-	waypoint := Coordinates{X: 10, Y: -1}
-
-	for _, command := range commands {
-		position, waypoint = steerByWaypoint(position, waypoint, command)
-	}
-
-	manhattan := math.Abs(float64(position.X)) + math.Abs(float64(position.Y))
-	fmt.Println("Part 2 =", manhattan)
 }
 
 // Local Variables:

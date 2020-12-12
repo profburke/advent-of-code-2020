@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"math"
-)
-
 func determineNewPosition(position Coordinates, heading Heading, distance int) (newPosition Coordinates) {
 	switch heading {
 	case N:
@@ -120,8 +115,9 @@ func determineNewHeading(heading Heading, command Command) (newHeading Heading) 
 	return
 }
 
-func steer(position Coordinates, heading Heading, command Command) (newPosition Coordinates,
-	newHeading Heading) {
+func steer(position, waypoint Coordinates, heading Heading, command Command) (newPosition, newWaypoint Coordinates, newHeading Heading) {
+	newWaypoint = waypoint
+
 	switch command.Direction {
 	case "F":
 		newPosition = determineNewPosition(position, heading, command.Distance)
@@ -144,18 +140,6 @@ func steer(position Coordinates, heading Heading, command Command) (newPosition 
 	}
 
 	return
-}
-
-func part1(commands []Command) {
-	position := Coordinates{X: 0, Y: 0}
-	var heading = E
-
-	for _, command := range commands {
-		position, heading = steer(position, heading, command)
-	}
-
-	manhattan := math.Abs(float64(position.X)) + math.Abs(float64(position.Y))
-	fmt.Println("Part 1 =", manhattan)
 }
 
 // Local Variables:

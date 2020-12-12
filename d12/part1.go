@@ -19,98 +19,22 @@ func move(position Coordinates, heading Heading, distance int) (newPosition Coor
 	return
 }
 
-func turnRight(heading Heading, degrees int) (newHeading Heading) {
-	switch heading {
-	case N:
-		switch degrees {
-		case 90:
-			newHeading = E
-		case 180:
-			newHeading = S
-		case 270:
-			newHeading = W
-		}
-	case E:
-		switch degrees {
-		case 90:
-			newHeading = S
-		case 180:
-			newHeading = W
-		case 270:
-			newHeading = N
-		}
-	case S:
-		switch degrees {
-		case 90:
-			newHeading = W
-		case 180:
-			newHeading = N
-		case 270:
-			newHeading = E
-		}
-	case W:
-		switch degrees {
-		case 90:
-			newHeading = N
-		case 180:
-			newHeading = E
-		case 270:
-			newHeading = S
-		}
-	}
-
-	return
-}
-
-func turnLeft(heading Heading, degrees int) (newHeading Heading) {
-	switch heading {
-	case N:
-		switch degrees {
-		case 90:
-			newHeading = W
-		case 180:
-			newHeading = S
-		case 270:
-			newHeading = E
-		}
-	case E:
-		switch degrees {
-		case 90:
-			newHeading = N
-		case 180:
-			newHeading = W
-		case 270:
-			newHeading = S
-		}
-	case S:
-		switch degrees {
-		case 90:
-			newHeading = E
-		case 180:
-			newHeading = N
-		case 270:
-			newHeading = W
-		}
-	case W:
-		switch degrees {
-		case 90:
-			newHeading = S
-		case 180:
-			newHeading = E
-		case 270:
-			newHeading = N
-		}
-	}
-
-	return
-}
-
 func changeHeading(heading Heading, command Command) (newHeading Heading) {
+	modifier := 1
 	if command.Direction == "L" {
-		newHeading = turnLeft(heading, command.Distance)
-	} else {
-		newHeading = turnRight(heading, command.Distance)
+		modifier = -1
 	}
+
+	heading += 4
+	switch command.Distance {
+	case 90:
+		heading += Heading(1 * modifier)
+	case 180:
+		heading += Heading(2 * modifier)
+	case 270:
+		heading += Heading(3 * modifier)
+	}
+	newHeading = heading % 4
 
 	return
 }

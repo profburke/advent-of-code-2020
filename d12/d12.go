@@ -21,8 +21,10 @@ func readData() (data []Command) {
 	return
 }
 
-func doit(commands []Command, partN int,
-	steer func(Coordinates, Coordinates, Heading, Command) (Coordinates, Coordinates, Heading)) {
+// clean this up by using interfaces? (i.e. smooth over the waypoint vs heading)
+type SteeringFunction func(Coordinates, Coordinates, Heading, Command) (Coordinates, Coordinates, Heading)
+
+func doit(commands []Command, partN int, steer SteeringFunction) {
 	position := Coordinates{X: 0, Y: 0}
 	waypoint := Coordinates{X: 10, Y: -1}
 	heading := E

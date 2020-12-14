@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+type MemoryAdjuster func(map[int]int, string, int, int)
 type Pair struct {
 	left  string
 	right string
@@ -29,7 +30,7 @@ func readData() (pairs []Pair) {
 	return
 }
 
-func applyMask(mask string, value int) int {
+func applyValueMask(mask string, value int) int {
 	high := len(mask) - 1
 
 	for index, bit := range mask {
@@ -48,28 +49,6 @@ func applyMask(mask string, value int) int {
 	}
 
 	return value
-}
-
-func part1(pairs []Pair) {
-	var mask string
-	sum := 0
-	memory := make(map[int]int)
-
-	for _, pair := range pairs {
-		if pair.left == "mask" {
-			mask = pair.right
-		} else {
-			address, _ := strconv.Atoi(pair.left[4 : len(pair.left)-1])
-			value, _ := strconv.Atoi(pair.right)
-			memory[address] = applyMask(mask, value)
-		}
-	}
-
-	for _, value := range memory {
-		sum += value
-	}
-
-	fmt.Println("Part 1 =", sum)
 }
 
 func hasFloatingBit(a string) bool {
@@ -117,10 +96,9 @@ func applyAddressMask(mask string, address int) (addresses []int) {
 	return
 }
 
-func part2(pairs []Pair) {
+func fillMemory(pairs []Pair, adjustMemory MemoryAdjuster) (memory map[int]int) {
 	var mask string
-	sum := 0
-	memory := make(map[int]int)
+	memory = make(map[int]int)
 
 	for _, pair := range pairs {
 		if pair.left == "mask" {
@@ -128,18 +106,36 @@ func part2(pairs []Pair) {
 		} else {
 			address, _ := strconv.Atoi(pair.left[4 : len(pair.left)-1])
 			value, _ := strconv.Atoi(pair.right)
-			addresses := applyAddressMask(mask, address)
-			for _, address := range addresses {
-				memory[address] = value
-			}
+			adjustMemory(memory, mask, address, value)
 		}
 	}
 
-	for _, value := range memory {
+	return
+}
+
+func sum(ints map[int]int) (sum int) {
+	for _, value := range ints {
 		sum += value
 	}
 
-	fmt.Println("Part 2 =", sum)
+	return
+}
+
+func part1(pairs []Pair) {
+	memory := fillMemory(pairs, func(memory map[int]int, mask string, address, value int) {
+		memory[address] = applyValueMask(mask, value)
+	})
+	fmt.Println("Part 1 =", sum(memory))
+}
+
+func part2(pairs []Pair) {
+	memory := fillMemory(pairs, func(memory map[int]int, mask string, address, value int) {
+		addresses := applyAddressMask(mask, address)
+		for _, address := range addresses {
+			memory[address] = value
+		}
+	})
+	fmt.Println("Part 2 =", sum(memory))
 }
 
 func main() {

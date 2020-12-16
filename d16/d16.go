@@ -19,7 +19,6 @@ func (r Range) Contains(value int) bool {
 }
 
 type Field struct {
-	Name   string
 	First  Range
 	Second Range
 }
@@ -30,7 +29,7 @@ func (f Field) Valid(value int) bool {
 
 type Ticket []int
 
-func (t Ticket) Valid(value int, fields []Field) bool {
+func (t Ticket) Valid(value int, fields map[string]Field) bool {
 	for _, field := range fields {
 		if field.Valid(value) {
 			return true
@@ -40,9 +39,9 @@ func (t Ticket) Valid(value int, fields []Field) bool {
 	return false
 }
 
-func readData() (fields []Field, myTicket Ticket, tickets []Ticket) {
+func readData() (fields map[string]Field, myTicket Ticket, tickets []Ticket) {
 	scanner := bufio.NewScanner(os.Stdin)
-	fields = make([]Field, 0)
+	fields = make(map[string]Field)
 	tickets = make([]Ticket, 0)
 	re, _ := regexp.Compile("(.+): (\\d+)-(\\d+) or (\\d+)-(\\d+)")
 
@@ -59,11 +58,10 @@ func readData() (fields []Field, myTicket Ticket, tickets []Ticket) {
 		h2, _ := strconv.Atoi(parts[5])
 
 		field := Field{}
-		field.Name = parts[1]
 		field.First = Range{Low: l1, High: h1}
 		field.Second = Range{Low: l2, High: h2}
 
-		fields = append(fields, field)
+		fields[parts[1]] = field
 	}
 
 	// deal with my ticket
@@ -94,28 +92,48 @@ func readData() (fields []Field, myTicket Ticket, tickets []Ticket) {
 	return
 }
 
-func part1(fields []Field, tickets []Ticket) {
+func part1(fields map[string]Field, tickets []Ticket) (validTickets []Ticket) {
 	esr := 0
+	validTickets = make([]Ticket, 0)
 
 	for _, ticket := range tickets {
+		valid := true
+
 		for _, value := range ticket {
 			if !ticket.Valid(value, fields) {
+				valid = false
 				esr += value
 			}
+		}
+
+		if valid {
+			validTickets = append(validTickets, ticket)
 		}
 	}
 
 	fmt.Println("Part 1 =", esr)
+
+	return
 }
 
-func part2(fields []Field, myTicket Ticket, Tickets []Ticket) {
+func part2(fields map[string]Field, myTicket Ticket, Tickets []Ticket) {
+	// identifiedFieldNames := make([]string, len(fields))
+
+	product := 1
+	// for _, name := range identifiedFieldNames {
+	// 	if name[0] == 'd' {
+	// 		product *= fields[name]
+	// 	}
+	// }
+
+	fmt.Println("Part 2 =", product)
 }
 
 func main() {
 	fields, myTicket, tickets := readData()
 
-	part1(fields, tickets)
-	part2(fields, myTicket, tickets)
+	validTickets := part1(fields, tickets)
+	part2(fields, myTicket, validTickets)
 }
 
 // Local Variables:

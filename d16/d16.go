@@ -19,6 +19,7 @@ func (r Range) Contains(value int) bool {
 }
 
 type Field struct {
+	Name   string
 	First  Range
 	Second Range
 }
@@ -43,7 +44,7 @@ func readData() (fields []Field, myTicket Ticket, tickets []Ticket) {
 	scanner := bufio.NewScanner(os.Stdin)
 	fields = make([]Field, 0)
 	tickets = make([]Ticket, 0)
-	re, _ := regexp.Compile(".+: (\\d+)-(\\d+) or (\\d+)-(\\d+)")
+	re, _ := regexp.Compile("(.+): (\\d+)-(\\d+) or (\\d+)-(\\d+)")
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -52,12 +53,13 @@ func readData() (fields []Field, myTicket Ticket, tickets []Ticket) {
 		}
 
 		parts := re.FindStringSubmatch(line)
-		l1, _ := strconv.Atoi(parts[1])
-		h1, _ := strconv.Atoi(parts[2])
-		l2, _ := strconv.Atoi(parts[3])
-		h2, _ := strconv.Atoi(parts[4])
+		l1, _ := strconv.Atoi(parts[2])
+		h1, _ := strconv.Atoi(parts[3])
+		l2, _ := strconv.Atoi(parts[4])
+		h2, _ := strconv.Atoi(parts[5])
 
 		field := Field{}
+		field.Name = parts[1]
 		field.First = Range{Low: l1, High: h1}
 		field.Second = Range{Low: l2, High: h2}
 
@@ -106,10 +108,14 @@ func part1(fields []Field, tickets []Ticket) {
 	fmt.Println("Part 1 =", esr)
 }
 
+func part2(fields []Field, myTicket Ticket, Tickets []Ticket) {
+}
+
 func main() {
-	fields, _, tickets := readData()
+	fields, myTicket, tickets := readData()
 
 	part1(fields, tickets)
+	part2(fields, myTicket, tickets)
 }
 
 // Local Variables:

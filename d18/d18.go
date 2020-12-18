@@ -45,7 +45,7 @@ func readData() (expressions []TokenStream) {
 }
 
 // Takes expression and converts to postfix
-func infixToPostfix(expression TokenStream) (result TokenStream) {
+func infixToPostfix1(expression TokenStream) (result TokenStream) {
 	result = make(TokenStream, 0)
 	s := stack.New()
 
@@ -75,6 +75,46 @@ func infixToPostfix(expression TokenStream) (result TokenStream) {
 	for s.Len() > 0 {
 		t := s.Pop().(Token)
 		result = append(result, t)
+	}
+
+	return
+}
+
+func precedence(operator string) int {
+	switch operator {
+	case "+":
+		return 2
+	case "*":
+		return 1
+	}
+	return -1 // shouldn't get here
+}
+
+func infixToPostfix2(expression TokenStream) (result TokenStream) {
+	result = make(TokenStream, 0)
+	s := stack.New()
+
+	for _, t := range expression {
+		switch t.kind {
+		case OPERAND:
+			result = append(result, t)
+		case OPERATOR:
+			for s.Len() > 0 && precedence(t.sValue) <= precedence(s.Peek().(Token).sValue) {
+				result = append(result, s.Pop().(Token))
+			}
+			s.Push(t)
+		case LPAREN:
+			s.Push(t)
+		case RPAREN:
+			for s.Len() > 0 && s.Peek().(Token).kind != LPAREN {
+				result = append(result, s.Pop().(Token))
+			}
+			_ = s.Pop().(Token) // better be an lparen
+		}
+	}
+
+	for s.Len() > 0 {
+		result = append(result, s.Pop().(Token))
 	}
 
 	return
@@ -111,7 +151,7 @@ func part1(expressions []TokenStream) {
 	sum := 0
 
 	for _, expression := range expressions {
-		postfix := infixToPostfix(expression)
+		postfix := infixToPostfix1(expression)
 		sum += eval(postfix)
 	}
 
@@ -119,6 +159,14 @@ func part1(expressions []TokenStream) {
 }
 
 func part2(expressions []TokenStream) {
+	sum := 0
+
+	for _, expression := range expressions {
+		postfix := infixToPostfix2(expression)
+		sum += eval(postfix)
+	}
+
+	fmt.Println("Part 2 =", sum)
 }
 
 func main() {

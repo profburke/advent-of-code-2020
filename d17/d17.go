@@ -8,7 +8,7 @@ import (
 )
 
 func readData() (ca CA3) {
-	ca = CA3{X1: 0, Y1: 0, Z1: 0, Z2: 0}
+	ca = CA3{X1: 0, Y1: 0, Z1: 0, Z2: 0, W1: 0, W2: 0}
 	ca.G = make(Grid)
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -22,7 +22,7 @@ func readData() (ca CA3) {
 		for _, cell := range cells {
 			y++
 			if cell == "#" {
-				c := Coordinates{X: x, Y: y, Z: 0}
+				c := Coordinates{X: x, Y: y, Z: 0, W: 0}
 				ca.G[c] = true
 			}
 		}

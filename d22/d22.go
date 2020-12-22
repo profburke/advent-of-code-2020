@@ -36,23 +36,38 @@ func readData() (decks []Deck) {
 	return
 }
 
+func gameOver(decks []Deck) (winner int) {
+	for i, deck := range decks {
+		if len(deck) == 0 {
+			return 1 - i
+		}
+	}
+
+	return -1
+}
+
+func score(deck Deck) (result int) {
+	multiplier := len(deck)
+
+	for _, card := range deck {
+		result += (card * multiplier)
+		multiplier--
+	}
+
+	return
+}
+
 func part1(decks []Deck) {
 	var winner int
 
 	for true {
-		aLen := len(decks[0])
-		bLen := len(decks[1])
-
-		if aLen == 0 {
-			winner = 1
-			break
-		} else if bLen == 0 {
-			winner = 0
+		if winner = gameOver(decks); winner > -1 {
 			break
 		}
 
 		aCard := decks[0][0]
 		decks[0] = decks[0][1:]
+
 		bCard := decks[1][0]
 		decks[1] = decks[1][1:]
 
@@ -63,15 +78,7 @@ func part1(decks []Deck) {
 		}
 	}
 
-	// determine winner's score
-	score := 0
-	multiplier := len(decks[winner])
-
-	for _, card := range decks[winner] {
-		score += (card * multiplier)
-		multiplier--
-	}
-
+	score := score(decks[winner])
 	fmt.Println("Part 1 =", score)
 }
 

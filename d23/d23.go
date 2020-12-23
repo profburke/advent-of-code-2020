@@ -45,11 +45,11 @@ func findDestination(r *ring.Ring, min, max int) (d *ring.Ring) {
 	return
 }
 
-func part1(cups []int) {
+func play(cups []int, n int) (r *ring.Ring) {
 	min := math.MaxInt64
 	max := math.MinInt64
 	l := len(cups)
-	r := ring.New(l)
+	r = ring.New(l)
 
 	for i := 0; i < l; i++ {
 		r.Value = cups[i]
@@ -66,9 +66,7 @@ func part1(cups []int) {
 		}
 	})
 
-	fmt.Println(ToString(r))
-
-	for i := 0; i < 100; i++ {
+	for i := 0; i < n; i++ {
 		// remove three cups to right of current
 		removed := r.Unlink(3)
 
@@ -80,11 +78,23 @@ func part1(cups []int) {
 
 		// adjust current
 		r = r.Next()
-
-		fmt.Println(ToString(r))
 	}
 
+	for true {
+		if r.Value.(int) == 1 {
+			break
+		}
+
+		r = r.Next()
+	}
+
+	return
+}
+
+func part1(cups []int) {
 	result := ""
+
+	r := play(cups, 100)
 	r.Do(func(p interface{}) {
 		result += fmt.Sprintf("%d", p.(int))
 	})

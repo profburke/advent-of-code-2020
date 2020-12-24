@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -21,6 +22,8 @@ const (
 	Southeast           = iota
 	Southwest           = iota
 )
+
+var AllDirections = []Direction{East, West, Northeast, Northwest, Southeast, Southwest}
 
 func (d Direction) String() string {
 	return [...]string{"West", "Northwest", "Northeast", "East",
@@ -123,8 +126,8 @@ func walk(steps []Direction) (location Coordinates) {
 	return
 }
 
-func part1(data [][]Direction) {
-	blackTiles := make(map[Coordinates]bool)
+func part1(data [][]Direction) (blackTiles map[Coordinates]bool) {
+	blackTiles = make(map[Coordinates]bool)
 
 	for _, steps := range data {
 		location := walk(steps)
@@ -137,16 +140,100 @@ func part1(data [][]Direction) {
 	}
 
 	fmt.Println("Part 1 =", len(blackTiles))
+
+	return
 }
 
-func part2(data [][]Direction) {
+func getBounds(blackTiles map[Coordinates]bool) (minX, minY, maxX, maxY int) {
+	minX = math.MaxInt64
+	minY = math.MaxInt64
+	maxX = math.MinInt64
+	maxY = math.MinInt64
+
+	for c, _ := range blackTiles {
+		if c.X < minX {
+			minX = c.X
+		}
+		if c.X > maxX {
+			maxX = c.X
+		}
+		if c.Y < minY {
+			minY = c.Y
+		}
+		if c.Y > maxY {
+			maxY = c.Y
+		}
+	}
+
+	return
+}
+
+func neighbors(cell Coordinates, blackTiles map[Coordinates]bool) (count int) {
+
+	for _, d := range AllDirections {
+		l := d.From(cell)
+		if _, found := blackTiles[l]; found {
+			count++
+		}
+	}
+
+	return
+}
+
+type CellState int
+
+const (
+	Black CellState = 0
+	White           = 1
+)
+
+func getState(cell Coordinates, blackTiles map[Coordinates]bool) CellState {
+	if _, found := blackTiles[cell]; found {
+		return Black
+	} else {
+		return White
+	}
+}
+
+func step(blackTiles map[Coordinates]bool) (newBlackTiles map[Coordinates]bool) {
+	minX, minY, maxX, maxY := getBounds(blackTiles)
+	newBlackTiles = make(map[Coordinates]bool)
+
+	for x := minX - 1; x <= maxX+1; x++ {
+		for y := minY - 1; y <= maxY+1; y++ {
+			cell := Coordinates{X: x, Y: y}
+			count := neighbors(cell, blackTiles)
+			state := getState(cell, blackTiles)
+			switch state {
+			case Black:
+				if count == 1 || count == 2 {
+					newBlackTiles[cell] = true
+				}
+			case White:
+				if count == 2 {
+					newBlackTiles[cell] = true
+				}
+			}
+		}
+	}
+
+	return
+}
+
+func part2(blackTiles map[Coordinates]bool) {
+
+	for i := 0; i < 100; i++ {
+		blackTiles = step(blackTiles)
+	}
+
+	fmt.Println("Part 2 =", len(blackTiles))
 }
 
 func main() {
 	data := readData()
 
-	part1(data)
-	part2(data)
+	blackTiles := part1(data)
+	part2(blackTiles)
 }
 
 // Local Variables:
